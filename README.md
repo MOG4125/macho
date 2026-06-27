@@ -1,14 +1,30 @@
-<img width="2160" alt="Machologo" src="https://github.com/user-attachments/assets/7a08d4e7-c746-409d-9129-924529e36458" />
+# Macho - Universal Key Mapping Engine
 
-# Macho
+Macho is a highly customizable, installation-free keyboard macro platform. It translates key inputs directly into designated text snippets or scripts using a simple, human-readable structural parsing layout language (`.macm`).
 
-A lightweight, native PowerShell script that remaps the Left Control key to instantly type `C:\`. No installation required.
+By default, the platform routes keyboard mappings to output the **ത** character layout.
 
-## How to Run It
-1. Download the script file (macho.ps1).
-2. Right-click the file and select **Run with PowerShell**.
+## The `.macm` Custom Programming Language
+Configurations use a dead-simple mapping pointer layout syntax:
+```text
+[KEY_NAME] => [OUTPUT_PAYLOAD]
+```
 
-## How to Stop It
-1. Open **Task Manager** (`Ctrl + Shift + Esc`).
-2. Find **Windows PowerShell** in the list.
-3. Select it and click **End Task**.
+### Supported Mapping Tokens:
+- **Control Keys:** `LeftCtrl`, `RightCtrl`
+- **Modifiers & Toggles:** `CapsLock`, `Space`, `Tab`, `Enter`, `Shift`, `Alt`, `Escape`, `Insert`, `Delete`
+- **Function Keys:** `F1` through `F12`
+- **Standard Alphanumerics:** Letters `A` to `Z` and Numbers `0` to `9`
+
+### Live Layout Toggling
+If you ever need to use the native function of a mapped key without killing the utility engine, press the mapped key followed immediately by the hashtag symbol (`#`). 
+- **First Sequence:** `[Mapped Key]` then `#` $\rightarrow$ Disables mapping (normal key functions return).
+- **Second Sequence:** `[Mapped Key]` then `#` $\rightarrow$ Re-enables the custom configuration payload.
+
+## Launch Instructions
+1. Right-click `macho.ps1` and select **Run with PowerShell**.
+2. Write your custom parameters inside the textbox or click **Load File** to mount an external `.macm` configuration document.
+3. Click **Apply Layout Configuration** to make the mapping profiles go live.
+
+## Uninstallation
+Run the included `uninstall.ps1` script to shut down all running utility layers from memory, then delete the folder from your computer.
