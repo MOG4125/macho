@@ -1,4 +1,4 @@
-<img width="2160" height="1620" alt="Machologo" src="https://github.com/user-attachments/assets/7a08d4e7-c746-409d-9129-924529e36458" />
+<img width="2160" alt="Machologo" src="https://github.com/user-attachments/assets/7a08d4e7-c746-409d-9129-924529e36458" />
 
 # Macho
 
