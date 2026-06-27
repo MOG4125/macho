@@ -29,7 +29,6 @@ public class MachoEngine {
     private static LowLevelKeyboardProc _proc = HookCallback;
     public static IntPtr _hookID = IntPtr.Zero;
     
-    // Virtual Key Code to Unicode Output dictionary
     public static Dictionary<int, string> KeyMap = new Dictionary<int, string>();
     private static bool _isEnabled = true;
     private static bool _lastKeyWasMapped = false;
@@ -46,11 +45,9 @@ public class MachoEngine {
 
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-    // Dynamic hardware-independent input rendering engine 
     private static void SendUnicodeString(string text) {
         foreach (char c in text) {
-            // Generates synchronous KeyDown and KeyUp events for raw Unicode data
-            keybd_event(0, (byte)c, 4, 0); // 4 = KEYEVENTF_UNICODE
+            keybd_event(0, (byte)c, 4, 0); // KEYEVENTF_UNICODE
             keybd_event(0, (byte)c, 4 | KEYEVENTF_KEYUP, 0);
         }
     }
@@ -59,18 +56,22 @@ public class MachoEngine {
         if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN) {
             int vkCode = Marshal.ReadInt32(lParam);
 
-            // Hashtag Toggle sequence handling (# key code: 51)
             if (_lastKeyWasMapped && vkCode == 51) {
                 _isEnabled = !_isEnabled;
                 _lastKeyWasMapped = false;
-                return (IntPtr)1; // Consume the keypress
+                return (IntPtr)1;
             }
 
             if (KeyMap.ContainsKey(vkCode)) {
                 if (_isEnabled) {
-                    SendUnicodeString(KeyMap[vkCode]);
+                    string action = KeyMap[vkCode];
+                    if (action.StartsWith("http://") || action.StartsWith("https://")) {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(action) { UseShellExecute = true });
+                    } else {
+                        SendUnicodeString(action);
+                    }
                     _lastKeyWasMapped = true;
-                    return (IntPtr)1; // Suppress system execution of intercepted key
+                    return (IntPtr)1;
                 } else {
                     _lastKeyWasMapped = true;
                     return CallNextHookEx(_hookID, nCode, wParam, lParam);
@@ -84,18 +85,15 @@ public class MachoEngine {
 "@
 Add-Type -TypeDefinition $Source -ReferencedAssemblies "System.Windows.Forms"
 
-# --- Full Comprehensive Universal Virtual Key Translation Map ---
 $VKLookup = @{
-    "LeftCtrl"=[int]162; "RightCtrl"=[int]163; "CapsLock"=[int]20; "Space"=[int]32; "Tab"=[int]9; 
-    "Enter"=[int]13; "Shift"=[int]16; "Alt"=[int]18; "Escape"=[int]27; "Insert"=[int]45; "Delete"=[int]46;
-    "F1"=[int]112; "F2"=[int]113; "F3"=[int]114; "F4"=[int]115; "F5"=[int]116; "F6"=[int]117; 
-    "F7"=[int]118; "F8"=[int]119; "F9"=[int]120; "F10"=[int]121; "F11"=[int]122; "F12"=[int]123;
-    "A"=[int]65; "B"=[int]66; "C"=[int]67; "D"=[int]68; "E"=[int]69; "F"=[int]70; "G"=[int]71; 
-    "H"=[int]72; "I"=[int]73; "J"=[int]74; "K"=[int]75; "L"=[int]76; "M"=[int]77; "N"=[int]78; 
-    "O"=[int]79; "P"=[int]80; "Q"=[int]81; "R"=[int]82; "S"=[int]83; "T"=[int]84; "U"=[int]85; 
-    "V"=[int]86; "W"=[int]87; "X"=[int]88; "Y"=[int]89; "Z"=[int]90;
-    "0"=[int]48; "1"=[int]49; "2"=[int]50; "3"=[int]51; "4"=[int]52; "5"=[int]53; "6"=[int]54; 
-    "7"=[int]55; "8"=[int]56; "9"=[int]57
+    "LeftCtrl"=162; "RightCtrl"=163; "CapsLock"=20; "Space"=32; "Tab"=9; 
+    "Enter"=13; "Shift"=16; "Alt"=18; "Escape"=27; "Insert"=45; "Delete"=46;
+    "F1"=112; "F2"=113; "F3"=114; "F4"=115; "F5"=116; "F6"=117; 
+    "F7"=118; "F8"=119; "F9"=120; "F10"=121; "F11"=122; "F12"=123;
+    "A"=65; "B"=66; "C"=67; "D"=68; "E"=69; "F"=70; "G"=71; "H"=72; "I"=73; "J"=74; 
+    "K"=75; "L"=76; "M"=77; "N"=78; "O"=79; "P"=80; "Q"=81; "R"=82; "S"=83; "T"=84; 
+    "U"=85; "V"=86; "W"=87; "X"=88; "Y"=89; "Z"=90;
+    "0"=48; "1"=49; "2"=50; "3"=51; "4"=52; "5"=53; "6"=54; "7"=55; "8"=56; "9"=57
 }
 
 function Parse-Macm ($content) {
@@ -107,7 +105,6 @@ function Parse-Macm ($content) {
         if ($line -match "(.+)=>(.+)") {
             $keyName = $Matches[1].Trim()
             $action = $Matches[2].Trim()
-            
             if ($VKLookup.ContainsKey($keyName)) {
                 [MachoEngine]::KeyMap[$VKLookup[$keyName]] = $action
             }
@@ -115,7 +112,6 @@ function Parse-Macm ($content) {
     }
 }
 
-# --- Graphical User Interface Structure ---
 $Form = New-Object System.Windows.Forms.Form
 $Form.Text = "MACHO - Dynamic Keyboard Customization Platform"
 $Form.Size = New-Object System.Drawing.Size(520,460)
@@ -134,8 +130,7 @@ $TextBox.ScrollBars = "Vertical"
 $TextBox.Font = New-Object System.Drawing.Font("Consolas", 10)
 $TextBox.Location = New-Object System.Drawing.Point(15,40)
 $TextBox.Size = New-Object System.Drawing.Size(475,280)
-# Default template updated with target character configuration layout
-$TextBox.Text = "# Macho Translation Profile`r`nLeftCtrl => ത`r`nRightCtrl => ത`r`nCapsLock => Custom Output"
+$TextBox.Text = "# Macho Translation Profile`r`nLeftCtrl => ത`r`nRightCtrl => https://github.com"
 $Form.Controls.Add($TextBox)
 
 $BtnLoad = New-Object System.Windows.Forms.Button
