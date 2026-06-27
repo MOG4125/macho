@@ -5,7 +5,7 @@
 A lightweight, native PowerShell script that remaps the Left Control key to instantly type `C:\`. No installation required.
 
 ## How to Run It
-1. Download the script file (e.g., `shortcut.ps1`).
+1. Download the script file (macho.ps1).
 2. Right-click the file and select **Run with PowerShell**.
 
 ## How to Stop It
