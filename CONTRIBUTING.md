@@ -1,4 +1,4 @@
-# Contributing to Left-Ctrl Macro
+# Contributing to Macho
 
 Thank you for your interest in improving this native macro utility! 
 
