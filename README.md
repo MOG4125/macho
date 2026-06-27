@@ -1,3 +1,4 @@
+<img width="2160" alt="Machologo" src="https://github.com/user-attachments/assets/4d6b63c0-5ff1-4439-ab12-eb3795171703" />
 # Macho - Universal Key Mapping Engine
 
 Macho is a lightweight, local, installation-free keyboard customization platform. It allows users to write simple, human-readable logic profiles via its own custom scripting language extension (.macm) and map any physical key on their keyboard to output custom text sequences or launch websites.
